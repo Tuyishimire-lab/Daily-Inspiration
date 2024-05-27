@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Get your daily dose of motivation and affirmations!">
+  <title>Daily Inspirational Quotes | Motivation Station</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-image: url("/images/mountains.jpg"); /* Replace with your desired image URL */
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #333; /* Adjust text color for better contrast with background image */
+    }
+
+    .quote-container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .quote,
+    .author {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .quote.show,
+    .author.show {
+      opacity: 1;
+    }
+
+    .btn-refresh {
+      margin-top: 20px;
+    }
+
+    #loading {
+      display: none;
+      margin: 20px;
+    }
+
+    .quote {
+      font-size: 1.5rem;
+      line-height: 1.8;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    .author {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container quote-container">
+    <div id="quote" class="quote">Loading...</div>
+    <div id="author" class="author"></div>
+    <div id="loading" class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <button class="btn btn-primary btn-refresh" onclick="fetchQuote()">New Quote</button>
+  </div>
+
+  <script>
+    function saveQuoteToLocal(quote, author) {
+      localStorage.setItem('quote', quote);
+      localStorage.setItem('author', author);
+    }
+
+    function loadQuoteFromLocal() {
+      const quote = localStorage.getItem('quote');
+      const author = localStorage.getItem('author');
+      if (quote && author) {
+        document.getElementById('quote').innerText = quote;
+        document.getElementById('author').innerText = `— ${author}`;
+        document.getElementById('quote').classList.add('show');
+        document.getElementById('author').classList.add('show');
+      }
+    }
+
+    async function fetchQuote() {
+      document.getElementById('loading').style.display = 'block';
+      const response = await fetch('https://api.quotable.io/random');
+      const data = await response.json();
+      document.getElementById('quote').classList.remove('show');
+      document.getElementById('author').classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('quote').innerText = data.content;
+        document.getElementById('author').innerText = `— ${data.author}`;
+        document.getElementById('quote').classList.add('show');
+        document.getElementById('author').classList.add('show');
+        document.getElementById('loading').style.display = 'none';
+        saveQuoteToLocal(data.content, data.author);
+      }, 500);
+    }
+
+    // Load the last saved quote on page load
+    loadQuoteFromLocal();
+    fetchQuote();
+  </script>
+</body>
+</html>
